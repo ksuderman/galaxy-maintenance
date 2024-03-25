@@ -18,8 +18,7 @@ Will run the galaxy cleanup scripts in the recommend order. By default a 'dry-ru
 
 # number of days to use as a cut off; do not act on objects updated more recently than this
 DAYS=10
-DRYRUN=true
-GALAXY_CONFIG_FILE=/etc/galaxy/galaxy.yml
+GALAXY_CONFIG_FILE=${GALAXY_CONFIG_FILE:-/galaxy/server/config/galaxy.yml}
 
 
 while [[ $# > 0 ]] ; do
@@ -44,31 +43,16 @@ while [[ $# > 0 ]] ; do
   shift
 done
 
-#cd "$(dirname "$0")"/..
+CMD=/galaxy/server/scripts/cleanup_datasets/cleanup_datasets.py
+echo "DAYS      : $DAYS"
+echo "CONFIG    : $GALAXY_CONFIG_FILE"
+echo "CONNECTION: $GALAXY_CONFIG_OVERRIDE_DATABASE_CONNECTION"
+$CMD $GALAXY_CONFIG_FILE -d $DAYS -r --delete_userless_histories
+$CMD $GALAXY_CONFIG_FILE -d $DAYS -r --purge_histories
+$CMD $GALAXY_CONFIG_FILE -d $DAYS -r --purge_datasets
+$CMD $GALAXY_CONFIG_FILE -d $DAYS -r --purge_folders
+$CMD $GALAXY_CONFIG_FILE -d $DAYS -r --delete_datasets
+$CMD $GALAXY_CONFIG_FILE -d $DAYS -r --purge_datasets
 
-# . scripts/common_startup_functions.sh
-# 
-# setup_python
-# 
-# set_galaxy_config_file_var
+/galaxy/server/scripts/set_user_disk_usage.py -c $GALAXY_CONFIG_FILE
 
-#if [ "$DRYRUN" = true ]; then
-#  MODE="--info_only"
-#else
-#  MODE="-r"
-#fi
-
-#whoami
-#ls -alh /etc/galaxy
-MODE=-r
-
-echo "DAYS  : $DAYS"
-echo "CONFIG: $GALAXY_CONFIG_FILE"
-/usr/local/bin/cleanup_datasets.py $GALAXY_CONFIG_FILE -d $DAYS $MODE --delete_userless_histories
-/usr/local/bin/cleanup_datasets.py $GALAXY_CONFIG_FILE -d $DAYS $MODE --purge_histories
-/usr/local/bin/cleanup_datasets.py $GALAXY_CONFIG_FILE -d $DAYS $MODE --purge_datasets
-/usr/local/bin/cleanup_datasets.py $GALAXY_CONFIG_FILE -d $DAYS $MODE --purge_folders
-/usr/local/bin/cleanup_datasets.py $GALAXY_CONFIG_FILE -d $DAYS $MODE --delete_datasets
-/usr/local/bin/cleanup_datasets.py $GALAXY_CONFIG_FILE -d $DAYS $MODE --purge_datasets
-
-/usr/local/bin/set_user_disk_usage.py
