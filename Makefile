@@ -1,5 +1,5 @@
 image = ksuderman/galaxy-maintenance
-version = 0.6
+version = $(shell cat VERSION)
 platform = linux/amd64
 
 help:
@@ -23,3 +23,5 @@ run:
 push:
 	docker push $(image):$(version)
 
+test:
+	@echo "Version is $(version)"
