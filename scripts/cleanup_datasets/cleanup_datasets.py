@@ -185,6 +185,9 @@ def main():
 
     app_properties = app_properties_from_args(args, legacy_config_override=config_override)
     config = galaxy.config.Configuration(**app_properties)
+    connection = os.getenv("GALAXY_CONFIG_OVERRIDE_DATABASE_CONNECTION")
+    if connection:
+        config.database_connection = connection
     app = CleanupDatasetsApplication(config)
     cutoff_time = datetime.utcnow() - timedelta(days=args.days)
     now = strftime("%Y-%m-%d %H:%M:%S")
