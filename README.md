@@ -31,6 +31,7 @@ kubectl delete job admin-manual
 ```yaml
 cronJobs:
   admin:
+    enabled: false
     schedule: "0 0 30 2 *"
     image:
       repository: ksuderman/galaxy-maintenance
